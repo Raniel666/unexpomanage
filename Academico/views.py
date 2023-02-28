@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from django.views.generic import CreateView, ListView
 from .forms import AsignaturaForm, FormularioUsuario
-from .models import Asignatura, Usuario
+from .models import Materia, Usuario
 from django.contrib import messages
 from .carrito import Carrito
 
@@ -19,7 +19,7 @@ def portada(request):
 def asignatura_admin(request):
     form = AsignaturaForm()
     # En una variable guardamos todos los materia de una db
-    asignaturas = Asignatura.objects.all()
+    asignaturas = Materia.objects.all()
     print(asignaturas)
     if request.method == 'POST':
         form = AsignaturaForm(data=request.POST)
@@ -38,7 +38,7 @@ def asignatura_admin(request):
 
 
 def eliminarCurso(request, codigo):
-    asignatura = Asignatura.objects.get(codigo=codigo)
+    asignatura = Materia.objects.get(codigo=codigo)
     asignatura.delete()
 
     messages.success(request, "Curso Eliminado!")
@@ -47,7 +47,7 @@ def eliminarCurso(request, codigo):
 
 
 def edicionCurso(request, codigo):
-    asignatura = Asignatura.objects.get(codigo=codigo)
+    asignatura = Materia.objects.get(codigo=codigo)
     return render(request, "edicion_materia.html", {"asignatura": asignatura})
 
 
@@ -65,7 +65,7 @@ def editarCurso(request):
     if abierta == 'on':
         abierta_bool = True
 
-    asignatura = Asignatura.objects.get(codigo=codigo)
+    asignatura = Materia.objects.get(codigo=codigo)
     asignatura.nombre = nombre
     asignatura.unidades = unidades
     asignatura.credito_requerido = credito_requerido
@@ -172,20 +172,20 @@ def editarUsuario(request):
 
 
 def inscripciones(request):
-    asignaturas = Asignatura.objects.all()
+    asignaturas = Materia.objects.all()
     return render(request, "inscripciones.html", {"asignaturas": asignaturas})
 
 
 def agregar_materia(request, codigo):
     carrito = Carrito(request)
-    asignatura = Asignatura.objects.get(codigo=codigo)
+    asignatura = Materia.objects.get(codigo=codigo)
     carrito.agregar(asignatura)
     return redirect("academico:inscripciones")
 
 
 def eliminar_materia(request, codigo):
     carrito = Carrito(request)
-    asignatura = Asignatura.objects.get(codigo=codigo)
+    asignatura = Materia.objects.get(codigo=codigo)
     carrito.eliminar(asignatura)
     return redirect("academico:inscripciones")
 

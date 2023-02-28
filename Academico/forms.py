@@ -1,11 +1,11 @@
 from django.forms import ModelForm
 from django import forms
-from .models import Asignatura, Usuario
+from .models import Materia, Usuario
 
 #FORMULARIO PARA EL REGISTRO DE LAS ASIGNATURAS
 class AsignaturaForm(ModelForm):
     class Meta:
-        model = Asignatura
+        model = Materia
         # Creamos los campos a  traves del formulario
         fields = '__all__'
 

@@ -2,13 +2,32 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
-class Asignatura(models.Model):
+class Carrera(models.Model):
+    codigo_c = models.CharField(primary_key=True,  max_length=5)
+    nombre = models.CharField(max_length=100)
+    costo = models.FloatField()
+
+    def __str__(self):
+        return f'{self.nombre} {self.costo}'
+
+
+class Departamento(models.Model):
+    codigo_dep = models.CharField(primary_key=True,  max_length=5)
+    nombre = models.CharField(max_length=100)
+    carrera_ids = models.ManyToManyField(Carrera, "Carreras")
+
+    def __str__(self):
+        return f'{self.nombre}'
+
+
+class Materia(models.Model):
     codigo = models.CharField(primary_key=True,  max_length=5)
     nombre = models.CharField(max_length=100)
-    unidades = models.PositiveIntegerField()
-    credito_requerido = models.IntegerField()
-    cantidadmax_estudiantes = models.IntegerField()
-    cantidad_estudiantes = models.IntegerField()
+    creditos = models.PositiveIntegerField()
+    creditos_requerido = models.IntegerField()
+    departamento_id = models.ForeignKey(Departamento, on_delete=models.CASCADE)
+    # cantidadmax_estudiantes = models.IntegerField()
+    # cantidad_estudiantes = models.IntegerField()
     abierta = models.BooleanField(default=True)
     opciones_carrera = [('Industrial', 'Ingieneria Industrial'), ('Mecanica', 'Ingieneria Mecanica'),
                         ('Sistemas', 'Ingieneria Sistemas'), ('General', 'General')]
@@ -54,6 +73,7 @@ class Usuario(AbstractBaseUser):
                             max_length=8, blank=True, null=True)
     creditos_aprobados = models.IntegerField(
         'Creditos Aprobados', blank=True, null=True)
+    carrera_id = models.ForeignKey(Carrera, null=True, on_delete=models.CASCADE)
     fecha_inscripcion = models.DateField(
         'Fecha de inscripcion', blank=True, null=True)
     hora_inscripcion = models.TimeField(
