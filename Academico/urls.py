@@ -10,6 +10,7 @@ urlpatterns = [
      path('pensum/', login_required(views.asignatura_admin), name="pensum"),
      path('cursos/', login_required(views.cursos), name="cursos"),
      path('salir/', login_required(views.salir), name="salir"),
+     path('cursos/seleccion_carrera/<codigo>', login_required(views.seleccion_carrera)),
      path('pensum/eliminacionCurso/<codigo>', login_required(views.eliminarCurso)),
      path('pensum/edicionCurso/<codigo>', login_required(views.edicionCurso), name="editarCurso"),
      path('pensum/editarCurso/', login_required(views.editarCurso), name="editar"),
