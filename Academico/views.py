@@ -87,19 +87,22 @@ def cursos(request):
 def seleccion_carrera(request, codigo):
     # Obtengo la tabla de las carreras
     carrera = Carrera.objects.get(codigo_c=codigo)
+    # Obtengo los semestres de la clase Materia
+    semestres = Materia().opciones_semestres
+    semestre_dict = {}
     if carrera:
         # Si existe la carrera traeme los departamentos de esa carrera
         departamentos = Departamento.objects.filter(carrera_ids=codigo)
-        dpto_dict = {}
-        for departamento in departamentos:
-            dpto_dict[f"{departamento.codigo_dep}"] = []
-        for dpto in dpto_dict.keys():
-            # Por cada departamento traeme las materias
-            materias = Materia.objects.filter(departamento_id=dpto)
-            print(materias)
-        print(departamentos)
-        print(dpto_dict)
-        return render(request, "prueba.html", {"codigo": carrera})
+        # Guarda en un diccionario las materias por semestre
+        for semestre in semestres:
+            semestre_dict[f"{semestre[1]}"] = []
+            for departamento in departamentos:
+                dpto_code = departamento.codigo_dep
+                materias = Materia.objects.filter(departamento_id=dpto_code, semestre=semestre[0])
+                for materia in materias:
+                    semestre_dict[f"{semestre[1]}"].append(materia)
+
+        return render(request, "prueba.html", {"carrera": carrera, "materias_semestre": semestre_dict})
 
 
 def salir(request):
