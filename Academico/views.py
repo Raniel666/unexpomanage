@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from django.views.generic import CreateView, ListView
 from .forms import AsignaturaForm, FormularioUsuario
-from .models import Materia, Usuario
+from .models import Materia, Usuario, Departamento, Carrera
 from django.contrib import messages
 from .carrito import Carrito
 
@@ -81,7 +81,25 @@ def editarCurso(request):
 
 
 def cursos(request):
-    return render(request, "index.html")
+    carreras = Carrera.objects.all()
+    return render(request, "index.html", {"carreras": carreras})
+
+def seleccion_carrera(request, codigo):
+    # Obtengo la tabla de las carreras
+    carrera = Carrera.objects.get(codigo_c=codigo)
+    if carrera:
+        # Si existe la carrera traeme los departamentos de esa carrera
+        departamentos = Departamento.objects.filter(carrera_ids=codigo)
+        dpto_dict = {}
+        for departamento in departamentos:
+            dpto_dict[f"{departamento.codigo_dep}"] = []
+        for dpto in dpto_dict.keys():
+            # Por cada departamento traeme las materias
+            materias = Materia.objects.filter(departamento_id=dpto)
+            print(materias)
+        print(departamentos)
+        print(dpto_dict)
+        return render(request, "prueba.html", {"codigo": carrera})
 
 
 def salir(request):
