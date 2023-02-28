@@ -84,6 +84,7 @@ def cursos(request):
     carreras = Carrera.objects.all()
     return render(request, "index.html", {"carreras": carreras})
 
+
 def seleccion_carrera(request, codigo):
     # Obtengo la tabla de las carreras
     carrera = Carrera.objects.get(codigo_c=codigo)
