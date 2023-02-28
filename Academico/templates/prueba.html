@@ -1,0 +1,43 @@
+{%extends "./index.html" %}
+
+{% block title %}
+Cursos de carreras
+{% endblock %}
+
+{% block body %}
+    <!-- Seccion del Formulario -->
+    <div class="col-md-6 col-sm-12 col-lg-8 col-xl-8">
+        <h1>Materias por semestre</h1>
+        <h2>{{}}</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr class="text-center">
+                        <th>Codigo</th>
+                        <th>Nombre</th>
+                        <th>Creditos</th>
+                        <th>Alumnos Inscritos</th>
+                        <th>Especialidad</th>
+                        <th colspan="2">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for asignatura in asignaturas %}
+                    <tr class="text-center">
+                        <td>{{asignatura.codigo}}</td>
+                        <td>{{asignatura.nombre}}</td>
+                        <td>{{asignatura.unidades}}</td>
+                        <td>{{asignatura.cantidad_estudiantes}}</td>
+                        <td>{{asignatura.carrera}}</td>
+                        <td><a href="edicionCurso/{{asignatura.codigo}}" class="btn btn-info">Editar</a></td>
+                        <td><a href="eliminacionCurso/{{asignatura.codigo}}"
+                                class="btn btn-danger btn-eliminacion">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
