@@ -26,6 +26,10 @@ class Materia(models.Model):
     creditos = models.PositiveIntegerField()
     creditos_requerido = models.IntegerField()
     departamento_id = models.ForeignKey(Departamento, on_delete=models.CASCADE)
+    opciones_semestres = [(1, 'Semestre 1'), (2, 'Semestre 2'), (3, 'Semestre 3'),
+                        (4, 'Semestre 4'), (5, 'Semestre 5'), (6, 'Semestre 6'),
+                        (7, 'Semestre 7'), (8, 'Semestre 8'), (9, 'Semestre 9'), (10, 'Semestre 10')]
+    semestre = models.IntegerField(choices=opciones_semestres, blank=True, null=True)
     # cantidadmax_estudiantes = models.IntegerField()
     # cantidad_estudiantes = models.IntegerField()
     abierta = models.BooleanField(default=True)
