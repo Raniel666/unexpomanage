@@ -1,4 +1,5 @@
 from django.urls import path
+
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -23,6 +24,8 @@ urlpatterns = [
      path('inscripciones/agregarMateria/<codigo>', login_required(views.agregar_materia), name="agregar"),
      path('inscripciones/eliminarMateria/<codigo>', login_required(views.eliminar_materia), name="eliminar"),
      path('inscripciones/limpiarCarrito', login_required(views.limpiar_carrito), name="limpiar"),
+     # path('inscripciones/obtenerCarrito', login_required(views.obtener_carrito), name="obtener_carrito"),
+     path('pago/', login_required(views.registrar_inscripcion), name="registrar_inscripcion"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

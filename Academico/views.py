@@ -1,9 +1,10 @@
+from datetime import datetime
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from django.views.generic import CreateView, ListView
 from .forms import AsignaturaForm, FormularioUsuario
-from .models import Materia, Usuario, Departamento, Carrera
+from .models import Materia, Usuario, Departamento, Carrera, RegistroInscripcion
 from django.contrib import messages
 from .carrito import Carrito
 
@@ -196,7 +197,12 @@ def editarUsuario(request):
 def inscripciones(request):
     # Obtengo la tabla de las carreras
     codigo = request.user.carrera_id.codigo_c
+    estudiante = request.user.id
     carrera = Carrera.objects.get(codigo_c=codigo)
+    # Obtengo los registros de inscripcion del estudiantye
+    registros_ins = RegistroInscripcion.objects.filter(estudiante_id=estudiante)
+    for registro in registros_ins:
+        estado = registro.estado
     # Obtengo los semestres de la clase Materia
     semestres = Materia().opciones_semestres
     semestre_dict = {}
@@ -212,7 +218,7 @@ def inscripciones(request):
                 for materia in materias:
                     semestre_dict[f"{semestre[1]}"].append(materia)
 
-        return render(request, "inscripciones.html", {"carrera": carrera, "materias_semestre": semestre_dict})
+        return render(request, "inscripciones.html", {"carrera": carrera, "materias_semestre": semestre_dict, "inscripcion_estado": estado})
 
     # asignaturas = Materia.objects.all()
     # return render(request, "inscripciones.html", {"asignaturas": asignaturas})
@@ -236,3 +242,16 @@ def limpiar_carrito(request):
     carrito = Carrito(request)
     carrito.limpiar()
     return redirect("academico:inscripciones")
+
+
+def registrar_inscripcion(request):
+    carrito = Carrito(request).carrito
+    estudiante = request.user.id
+    registros = RegistroInscripcion.objects.filter(estudiante_id=estudiante)
+    for registro in registros:
+        for materia in carrito.keys():
+            registro.materias_ids.add(materia)
+        registro.estado = "pago"
+        registro.fecha_inscripcion = datetime.now()
+        registro.save()
+    return render(request, "pago_views.html", {"registros_inscripcion": registros})
