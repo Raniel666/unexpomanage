@@ -30,31 +30,35 @@ Inscripciones
             
             <div class="card-body">
                 <h2>Asignatura Ofertadas</h2>
+                {% for semestre, materias in materias_semestre.items %}
+                <h3>{{semestre}}</h3>
+                {% if materias %}
                 <table class="table table-striped">
-                    
                     <thead>
                         <tr class="text-center">
                             <th>Codigo</th>
                             <th>Nombre</th>
                             <th>Unidades</th>
-                            <th>Alumnos Inscritos</th>
-                            <th>Especialidad</th>
+                            <th>Departamento</th>
                             <th>Opcion</th>
                         </tr>
                     </thead>
                     <tbody>
-                    {% for asignatura in asignaturas %}
+                    {% for materia in materias %}
                         <tr class="text-center">
-                            <td>{{asignatura.codigo}}</td>
-                            <td>{{asignatura.nombre}}</td>
-                            <td>{{asignatura.unidades}}</td>
-                            <td>{{asignatura.cantidad_estudiantes}}</td>
-                            <td>{{asignatura.carrera}}</td>
-                            <td><a href="{% url 'academico:agregar' asignatura.codigo %}" class="btn btn-success">Agregar</a></td>
+                            <td>{{materia.codigo}}</td>
+                            <td>{{materia.nombre}}</td>
+                            <td>{{materia.creditos}}</td>
+                            <td>{{materia.departamento_id}}</td>
+                            <td><a href="{% url 'academico:agregar' materia.codigo %}" class="btn btn-success">Agregar</a></td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
+                {% else %}
+                <p>No hay materias en este semestre</p>
+                {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>
