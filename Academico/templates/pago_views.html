@@ -1,0 +1,31 @@
+{%extends "./base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+Inscripcion Pago
+{% endblock %}
+
+{% block estilos %} 
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;1,300;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/responsive.css">
+{% endblock %}
+
+{% block div %}
+{% for registro in registros_inscripcion %}
+{% if registro %}
+<p>Estado del registro de inscripcion: <strong style="color: green;">{{registro.estado}}</strong></p>
+<h2>Materias inscritas:</h2>
+<ul>
+{% for materia in registro.materias_ids %}
+    <li>{{materia.nombre}}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No hay registro de inscripcion</p>
+{% endif %}
+{% endfor %}
+<p style="font-size: 50;">Antes de inscribirte paga</p>
+{% endblock %}
