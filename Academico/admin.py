@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Materia, Usuario, Departamento, Carrera
+from .models import Materia, Usuario, Departamento, Carrera, RegistroInscripcion
 
 # Register your models here.
 
@@ -15,3 +15,4 @@ admin.site.register(Materia, FiltroAsignatura)
 admin.site.register(Usuario)
 admin.site.register(Departamento)
 admin.site.register(Carrera)
+admin.site.register(RegistroInscripcion)

@@ -121,3 +121,17 @@ class Usuario(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.usuario_administrador
+
+
+class RegistroInscripcion(models.Model):
+    id = models.AutoField(primary_key=True)
+    fecha_apertura = models.DateTimeField()
+    estudiante_id = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    materias_ids = models.ManyToManyField(Materia, null=True, blank=True)
+    fecha_inscripcion = models.DateTimeField(null=True, blank=True)
+    # pago_id =
+    estados = [("inscribiendo", "Inscribiendo"), ("pago", "Pago"), ("inscrito", "Inscrito")]
+    estado = models.CharField(choices=estados, max_length=15, default="inscribiendo")
+
+    def __str__(self):
+        return f'Registro: {self.id} Estudiante: {self.estudiante_id} Materias: {self.materias_ids}'
