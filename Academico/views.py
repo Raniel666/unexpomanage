@@ -194,8 +194,28 @@ def editarUsuario(request):
 
 
 def inscripciones(request):
-    asignaturas = Materia.objects.all()
-    return render(request, "inscripciones.html", {"asignaturas": asignaturas})
+    # Obtengo la tabla de las carreras
+    codigo = request.user.carrera_id.codigo_c
+    carrera = Carrera.objects.get(codigo_c=codigo)
+    # Obtengo los semestres de la clase Materia
+    semestres = Materia().opciones_semestres
+    semestre_dict = {}
+    if carrera:
+        # Si existe la carrera traeme los departamentos de esa carrera
+        departamentos = Departamento.objects.filter(carrera_ids=codigo)
+        # Guarda en un diccionario las materias por semestre
+        for semestre in semestres:
+            semestre_dict[f"{semestre[1]}"] = []
+            for departamento in departamentos:
+                dpto_code = departamento.codigo_dep
+                materias = Materia.objects.filter(departamento_id=dpto_code, semestre=semestre[0])
+                for materia in materias:
+                    semestre_dict[f"{semestre[1]}"].append(materia)
+
+        return render(request, "inscripciones.html", {"carrera": carrera, "materias_semestre": semestre_dict})
+
+    # asignaturas = Materia.objects.all()
+    # return render(request, "inscripciones.html", {"asignaturas": asignaturas})
 
 
 def agregar_materia(request, codigo):
