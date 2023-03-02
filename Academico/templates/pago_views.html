@@ -29,4 +29,10 @@ Inscripcion Pago
 {% endif %}
 <p style="font-size: 50;">Antes de inscribirte paga</p>
 <p><a href="{% url 'academico:volver_pendiente' %}" class="btn btn-info">Volver a pendiente</a></p>
+<form action="" method="post">
+    <table>
+        {{pago_form.as_table}}
+    </table>
+    <input type="submit" value="Confirmar">
+</form>
 {% endblock %}
