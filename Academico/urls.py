@@ -25,7 +25,7 @@ urlpatterns = [
      path('inscripciones/eliminarMateria/<codigo>', login_required(views.eliminar_materia), name="eliminar"),
      path('inscripciones/limpiarCarrito', login_required(views.limpiar_carrito), name="limpiar"),
      # path('inscripciones/obtenerCarrito', login_required(views.obtener_carrito), name="obtener_carrito"),
-     path('pago/registro_inscripcion', login_required(views.registrar_inscripcion), name="registrar_inscripcion"),
+     path('pago/registrar_inscripcion', login_required(views.registrar_inscripcion), name="registrar_inscripcion"),
      path('pago/volver_pendiente', login_required(views.volver_pendiente), name="volver_pendiente"),
 ]
 

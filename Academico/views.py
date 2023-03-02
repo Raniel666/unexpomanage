@@ -196,49 +196,55 @@ def editarUsuario(request):
 
 
 def inscripciones(request):
-    # Obtengo la tabla de las carreras
-    codigo = request.user.carrera_id.codigo_c
+    # Obtengo el id del estiduante
     estudiante = request.user.id
-    carrera = Carrera.objects.get(codigo_c=codigo)
+
     # Obtengo los registros de inscripcion del estudiante
-    registros_ins = RegistroInscripcion.objects.filter(estudiante_id=estudiante, estado="pendiente")
+    registros_ins = RegistroInscripcion.objects.filter(estudiante_id=estudiante)
+
     # Si tiene inscripciones en pendiente, traeme el registro
     if registros_ins:
         for registro in registros_ins:
             estado = registro.estado
             fecha_apertura = registro.fecha_apertura
-        fecha_actual = datetime.now(pytz.timezone('America/Caracas'))
-        if fecha_actual >= fecha_apertura:
-            # Obtengo los semestres de la clase Materia
-            semestres = Materia().opciones_semestres
-            semestre_dict = {}
-            if carrera:
-                # Si existe la carrera traeme los departamentos de esa carrera
-                departamentos = Departamento.objects.filter(carrera_ids=codigo)
-                # Guarda en un diccionario las materias por semestre
-                for semestre in semestres:
-                    semestre_dict[f"{semestre[1]}"] = []
-                    for departamento in departamentos:
-                        dpto_code = departamento.codigo_dep
-                        materias = Materia.objects.filter(departamento_id=dpto_code, semestre=semestre[0])
-                        for materia in materias:
-                            semestre_dict[f"{semestre[1]}"].append(materia)
+        if estado == "pendiente":
+            fecha_actual = datetime.now(pytz.timezone('America/Caracas'))
+            if fecha_actual >= fecha_apertura:
+                # Obtengo la tabla de las carreras
+                codigo = request.user.carrera_id.codigo_c
+                carrera = Carrera.objects.get(codigo_c=codigo)
+                # Obtengo los semestres de la clase Materia
+                semestres = Materia().opciones_semestres
+                semestre_dict = {}
+                if carrera:
+                    # Si existe la carrera traeme los departamentos de esa carrera
+                    departamentos = Departamento.objects.filter(carrera_ids=codigo)
+                    # Guarda en un diccionario las materias por semestre
+                    for semestre in semestres:
+                        semestre_dict[f"{semestre[1]}"] = []
+                        for departamento in departamentos:
+                            dpto_code = departamento.codigo_dep
+                            materias = Materia.objects.filter(departamento_id=dpto_code, semestre=semestre[0])
+                            for materia in materias:
+                                semestre_dict[f"{semestre[1]}"].append(materia)
 
+                    context = {
+                        "registro_inscripcion": registros_ins,
+                        "carrera": carrera,
+                        "materias_semestre": semestre_dict,
+                        "inscripcion_estado": estado,
+                        "turno_abierto": True
+                    }
+                    return render(request, "inscripciones.html", context)
+            else:
                 context = {
                     "registro_inscripcion": registros_ins,
-                    "carrera": carrera,
-                    "materias_semestre": semestre_dict,
-                    "inscripcion_estado": estado,
-                    "turno_abierto": True
+                    "turno_abierto": False,
+                    "fecha_apertura": fecha_apertura
                 }
                 return render(request, "inscripciones.html", context)
-        else:
-            context = {
-                "registro_inscripcion": registros_ins,
-                "turno_abierto": False,
-                "fecha_apertura": fecha_apertura
-            }
-            return render(request, "inscripciones.html", context)
+        elif estado == "pagado":
+            return redirect("academico:registrar_inscripcion")
     else:
         context = {
             "registro_inscripcion": False,
@@ -270,33 +276,32 @@ def limpiar_carrito(request):
 def registrar_inscripcion(request):
     carrito = Carrito(request).carrito
     estudiante_id = request.user.id
-    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id, estado="pagado")
+    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id)
 
     if registros_inscripcion:
         for registro in registros_inscripcion:
-            materias = registro.materias_ids.all()
+            estado = registro.estado
+            if estado == "pagado":
+                materias = registro.materias_ids.all()
 
-        context = {"registros_inscripcion": registros_inscripcion, "materias": materias}
-        return render(request, "pago_views.html", context)
+                context = {"registros_inscripcion": registros_inscripcion, "materias": materias}
+                return render(request, "pago_views.html", context)
 
-    else:
-        registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id, estado="pendiente")
-        if registros_inscripcion:
-            for registro in registros_inscripcion:
+            elif estado == "pendiente":
                 materias_ids = [materia_id for materia_id in carrito.keys()]
                 materias = Materia.objects.filter(codigo__in=materias_ids)
                 registro.materias_ids.set(materias)
                 registro.estado = "pagado"
-                registro.fecha_inscripcion = datetime.now()
+                registro.fecha_inscripcion = datetime.now(pytz.timezone('America/Caracas'))
                 registro.save()
 
                 materias = registro.materias_ids.all()
 
-            context = {"registros_inscripcion": registros_inscripcion, "materias": materias}
-            return render(request, "pago_views.html", context)
-        else:
-            context = {"registros_inscripcion": [], "materias": []}
-            return render(request, "pago_views.html", context)
+                context = {"registros_inscripcion": registros_inscripcion, "materias": materias}
+                return render(request, "pago_views.html", context)
+    else:
+        context = {"registros_inscripcion": [], "materias": []}
+        return render(request, "pago_views.html", context)
 
 
 def volver_pendiente(request):
