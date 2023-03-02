@@ -4,15 +4,13 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from django.views.generic import CreateView, ListView
-from .forms import AsignaturaForm, FormularioUsuario
-from .models import Materia, Usuario, Departamento, Carrera, RegistroInscripcion
+from .forms import AsignaturaForm, FormularioUsuario, FormularioPago
+from .models import Materia, Usuario, Departamento, Carrera, RegistroInscripcion, RegisttroPago
 from django.contrib import messages
 from .carrito import Carrito
 
 
-
 def portada(request):
-
     return render(request, "portada.html")
 
 # Create your views here.
@@ -22,7 +20,6 @@ def asignatura_admin(request):
     form = AsignaturaForm()
     # En una variable guardamos todos los materia de una db
     asignaturas = Materia.objects.all()
-    print(asignaturas)
     if request.method == 'POST':
         form = AsignaturaForm(data=request.POST)
         try:
@@ -243,8 +240,8 @@ def inscripciones(request):
                     "fecha_apertura": fecha_apertura
                 }
                 return render(request, "inscripciones.html", context)
-        elif estado == "pagado":
-            return redirect("academico:registrar_inscripcion")
+        elif estado == "pago":
+            return redirect("academico:estado_pago")
     else:
         context = {
             "registro_inscripcion": False,
@@ -272,8 +269,8 @@ def limpiar_carrito(request):
     return redirect("academico:inscripciones")
 
 
-# Accion para guardar los datos en la tabla de inscripciones
-def registrar_inscripcion(request):
+# Accion para guardar los datos en la tabla de inscripciones y pasar al estado de pago
+def estado_pago(request):
     carrito = Carrito(request).carrito
     estudiante_id = request.user.id
     registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id)
@@ -281,17 +278,30 @@ def registrar_inscripcion(request):
     if registros_inscripcion:
         for registro in registros_inscripcion:
             estado = registro.estado
-            if estado == "pagado":
+            if estado == "pago":
                 materias = registro.materias_ids.all()
 
-                context = {"registros_inscripcion": registros_inscripcion, "materias": materias}
-                return render(request, "pago_views.html", context)
+                if request.method == 'POST':
+                    pago_form = FormularioPago(request.POST)
+                    if pago_form.is_valid():
+                        pago_info = pago_form.cleaned_data
+
+                        context = {"pago_info": pago_info["cantidad_pago"]}
+                        return render(request, "congratulation.html", context)
+                else:
+                    pago_form = FormularioPago()
+                    context = {
+                        "registros_inscripcion": registros_inscripcion,
+                        "materias": materias,
+                        "pago_form": pago_form
+                    }
+                    return render(request, "pago_views.html", context)
 
             elif estado == "pendiente":
                 materias_ids = [materia_id for materia_id in carrito.keys()]
                 materias = Materia.objects.filter(codigo__in=materias_ids)
                 registro.materias_ids.set(materias)
-                registro.estado = "pagado"
+                registro.estado = "pago"
                 registro.fecha_inscripcion = datetime.now(pytz.timezone('America/Caracas'))
                 registro.save()
 
@@ -304,9 +314,13 @@ def registrar_inscripcion(request):
         return render(request, "pago_views.html", context)
 
 
+def estado_inscrito(request):
+    pass
+
+
 def volver_pendiente(request):
     estudiante_id = request.user.id
-    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id, estado="pagado")
+    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id, estado="pago")
 
     if registros_inscripcion:
         for registro in registros_inscripcion:
