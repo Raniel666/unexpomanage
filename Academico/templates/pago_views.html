@@ -13,19 +13,20 @@ Inscripcion Pago
     <link rel="stylesheet" href="css/responsive.css">
 {% endblock %}
 
-{% block div %}
+{% block body %}
+{% if registros_inscripcion %}
 {% for registro in registros_inscripcion %}
-{% if registro %}
 <p>Estado del registro de inscripcion: <strong style="color: green;">{{registro.estado}}</strong></p>
 <h2>Materias inscritas:</h2>
 <ul>
-{% for materia in registro.materias_ids %}
+{% for materia in materias %}
     <li>{{materia.nombre}}</li>
 {% endfor %}
 </ul>
+{% endfor %}
 {% else %}
 <p>No hay registro de inscripcion</p>
 {% endif %}
-{% endfor %}
 <p style="font-size: 50;">Antes de inscribirte paga</p>
+<p><a href="{% url 'academico:volver_pendiente' %}" class="btn btn-info">Volver a pendiente</a></p>
 {% endblock %}
