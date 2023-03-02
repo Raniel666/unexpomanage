@@ -244,14 +244,46 @@ def limpiar_carrito(request):
     return redirect("academico:inscripciones")
 
 
+# Accion para guardar los datos en la tabla de inscripciones
 def registrar_inscripcion(request):
     carrito = Carrito(request).carrito
-    estudiante = request.user.id
-    registros = RegistroInscripcion.objects.filter(estudiante_id=estudiante)
-    for registro in registros:
-        for materia in carrito.keys():
-            registro.materias_ids.add(materia)
-        registro.estado = "pago"
-        registro.fecha_inscripcion = datetime.now()
-        registro.save()
-    return render(request, "pago_views.html", {"registros_inscripcion": registros})
+    estudiante_id = request.user.id
+    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id, estado="pagado")
+
+    if registros_inscripcion:
+        for registro in registros_inscripcion:
+            materias = registro.materias_ids.all()
+
+        context = {"registros_inscripcion": registros_inscripcion, "materias": materias}
+        return render(request, "pago_views.html", context)
+
+    else:
+        registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id, estado="pendiente")
+        if registros_inscripcion:
+            for registro in registros_inscripcion:
+                materias_ids = [materia_id for materia_id in carrito.keys()]
+                materias = Materia.objects.filter(codigo__in=materias_ids)
+                registro.materias_ids.set(materias)
+                registro.estado = "pagado"
+                registro.fecha_inscripcion = datetime.now()
+                registro.save()
+
+                materias = registro.materias_ids.all()
+
+            context = {"registros_inscripcion": registros_inscripcion, "materias": materias}
+            return render(request, "pago_views.html", context)
+        else:
+            context = {"registros_inscripcion": [], "materias": []}
+            return render(request, "pago_views.html", context)
+
+
+def volver_pendiente(request):
+    estudiante_id = request.user.id
+    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id, estado="pagado")
+
+    if registros_inscripcion:
+        for registro in registros_inscripcion:
+            registro.estado = "pendiente"
+            registro.save()
+
+    return redirect("academico:inscripciones")
