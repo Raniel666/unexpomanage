@@ -14,6 +14,8 @@ Inscripciones
 {% endblock %}
 
 {% block body %}
+{% if registro_inscripcion %}
+{% if turno_abierto %}
 <div class="row py-4">
     <!-- Seccion de listado de Cursos -->
     <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
@@ -111,5 +113,12 @@ Inscripciones
         </div>
     </div>
 </div>
+{% else %}
+<p>Todavia no te toca inscribirte</p>
+<p>Tu inscripcion abre el {{fecha_apertura}}</p>
+{% endif %}
+{% else %}
+<p style="color: #c47917;">No se encontro registro de inscripcion para este estudiante</p>
+{% endif %}
 
 {% endblock %}

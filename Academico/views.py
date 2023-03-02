@@ -1,3 +1,4 @@
+import pytz
 from datetime import datetime
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -199,29 +200,50 @@ def inscripciones(request):
     codigo = request.user.carrera_id.codigo_c
     estudiante = request.user.id
     carrera = Carrera.objects.get(codigo_c=codigo)
-    # Obtengo los registros de inscripcion del estudiantye
-    registros_ins = RegistroInscripcion.objects.filter(estudiante_id=estudiante)
-    for registro in registros_ins:
-        estado = registro.estado
-    # Obtengo los semestres de la clase Materia
-    semestres = Materia().opciones_semestres
-    semestre_dict = {}
-    if carrera:
-        # Si existe la carrera traeme los departamentos de esa carrera
-        departamentos = Departamento.objects.filter(carrera_ids=codigo)
-        # Guarda en un diccionario las materias por semestre
-        for semestre in semestres:
-            semestre_dict[f"{semestre[1]}"] = []
-            for departamento in departamentos:
-                dpto_code = departamento.codigo_dep
-                materias = Materia.objects.filter(departamento_id=dpto_code, semestre=semestre[0])
-                for materia in materias:
-                    semestre_dict[f"{semestre[1]}"].append(materia)
+    # Obtengo los registros de inscripcion del estudiante
+    registros_ins = RegistroInscripcion.objects.filter(estudiante_id=estudiante, estado="pendiente")
+    # Si tiene inscripciones en pendiente, traeme el registro
+    if registros_ins:
+        for registro in registros_ins:
+            estado = registro.estado
+            fecha_apertura = registro.fecha_apertura
+        fecha_actual = datetime.now(pytz.timezone('America/Caracas'))
+        if fecha_actual >= fecha_apertura:
+            # Obtengo los semestres de la clase Materia
+            semestres = Materia().opciones_semestres
+            semestre_dict = {}
+            if carrera:
+                # Si existe la carrera traeme los departamentos de esa carrera
+                departamentos = Departamento.objects.filter(carrera_ids=codigo)
+                # Guarda en un diccionario las materias por semestre
+                for semestre in semestres:
+                    semestre_dict[f"{semestre[1]}"] = []
+                    for departamento in departamentos:
+                        dpto_code = departamento.codigo_dep
+                        materias = Materia.objects.filter(departamento_id=dpto_code, semestre=semestre[0])
+                        for materia in materias:
+                            semestre_dict[f"{semestre[1]}"].append(materia)
 
-        return render(request, "inscripciones.html", {"carrera": carrera, "materias_semestre": semestre_dict, "inscripcion_estado": estado})
-
-    # asignaturas = Materia.objects.all()
-    # return render(request, "inscripciones.html", {"asignaturas": asignaturas})
+                context = {
+                    "registro_inscripcion": registros_ins,
+                    "carrera": carrera,
+                    "materias_semestre": semestre_dict,
+                    "inscripcion_estado": estado,
+                    "turno_abierto": True
+                }
+                return render(request, "inscripciones.html", context)
+        else:
+            context = {
+                "registro_inscripcion": registros_ins,
+                "turno_abierto": False,
+                "fecha_apertura": fecha_apertura
+            }
+            return render(request, "inscripciones.html", context)
+    else:
+        context = {
+            "registro_inscripcion": False,
+        }
+        return render(request, "inscripciones.html", context)
 
 
 def agregar_materia(request, codigo):
