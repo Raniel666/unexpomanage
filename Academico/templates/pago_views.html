@@ -17,22 +17,21 @@ Inscripcion Pago
 {% if registros_inscripcion %}
 {% for registro in registros_inscripcion %}
 <p>Estado del registro de inscripcion: <strong style="color: green;">{{registro.estado}}</strong></p>
-<h2>Materias inscritas:</h2>
+<h2>Materias a inscribir:</h2>
 <ul>
 {% for materia in materias %}
-    <li>{{materia.nombre}}</li>
+    <li><b style="color: blue;">Materia</b>: <b style="color: green;">{{materia.nombre}}</b> <b style="color: blue;">Creditos</b>: <b style="color: green;">{{materia.creditos}}</b></li>
 {% endfor %}
 </ul>
 {% endfor %}
 {% else %}
 <p>No hay registro de inscripcion</p>
 {% endif %}
-<p style="font-size: 50;">Antes de inscribirte paga</p>
-<p><a href="{% url 'academico:volver_pendiente' %}" class="btn btn-info">Volver a pendiente</a></p>
-<form action="" method="post">
-    <table>
-        {{pago_form.as_table}}
-    </table>
+<p style="font-size: 50;">Total de creditos a pagar: <b style="color: green;">{{unidades_totales}}</b></p>
+<form action="" method="POST">
+    {% csrf_token %}
+    {{pago_form.as_table}}
     <input type="submit" value="Confirmar">
 </form>
+<p><a href="{% url 'academico:volver_pendiente' %}" class="btn btn-info">Volver a pendiente</a></p>
 {% endblock %}
