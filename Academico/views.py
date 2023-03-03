@@ -1,4 +1,5 @@
 import pytz
+from Academico.context_process import total
 from datetime import datetime
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -290,10 +291,12 @@ def estado_pago(request):
                         return render(request, "congratulation.html", context)
                 else:
                     pago_form = FormularioPago()
+
                     context = {
                         "registros_inscripcion": registros_inscripcion,
                         "materias": materias,
-                        "pago_form": pago_form
+                        "pago_form": pago_form,
+                        "unidades_totales": total(request)["total_creditos"]
                     }
                     return render(request, "pago_views.html", context)
 
@@ -306,8 +309,14 @@ def estado_pago(request):
                 registro.save()
 
                 materias = registro.materias_ids.all()
+                pago_form = FormularioPago()
 
-                context = {"registros_inscripcion": registros_inscripcion, "materias": materias}
+                context = {
+                    "registros_inscripcion": registros_inscripcion,
+                    "materias": materias,
+                    "pago_form": pago_form,
+                    "unidades_totales": total(request)["total_creditos"]
+                }
                 return render(request, "pago_views.html", context)
     else:
         context = {"registros_inscripcion": [], "materias": []}
