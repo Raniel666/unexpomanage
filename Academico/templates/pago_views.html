@@ -24,12 +24,36 @@ Inscripcion Pago
         <div class="progress-bar bg-info" style="width: 100%; height: 30px;">Inscrito</div>
     </div>
 </div>
-<h2>Materias a inscribir:</h2>
-<ul>
-{% for materia in materias %}
-    <li><b style="color: blue;">Materia</b>: <b style="color: green;">{{materia.nombre}}</b> <b style="color: blue;">Creditos</b>: <b style="color: green;">{{materia.creditos}}</b></li>
-{% endfor %}
-</ul>
+<h2 style="text-align: center; margin-top: 20px;">Materias a inscribir:</h2>
+<div class="container table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr class="text-center">
+                <th>Codigo</th>
+                <th>Nombre</th>
+                <th>Creditos</th>
+                <th>Departamento</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for materia in materias %}
+            <tr class="text-center">
+                <td>{{materia.codigo}}</td>
+                <td>{{materia.nombre}}</td>
+                <td>{{materia.creditos}}</td>
+                <td>{{materia.departamento_id}}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td></td>
+                <td></td>
+                <td>{{unidades_totales}}</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 {% endfor %}
 {% else %}
 <p>No hay registro de inscripcion</p>

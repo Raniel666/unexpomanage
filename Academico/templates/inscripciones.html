@@ -24,97 +24,99 @@ Inscripciones
         <div class="progress-bar bg-info" style="width: 100%; height: 30px;">Inscrito</div>
     </div>
 </div>
-<div class="row py-4">
-    <!-- Seccion de listado de Cursos -->
-    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>{{ message }}</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-        <div class="card">
-            
-            <div class="card-body">
-                <h2>Asignatura Ofertadas</h2>
-                {% for semestre, materias in materias_semestre.items %}
-                <h3>{{semestre}}</h3>
-                {% if materias %}
-                <table class="table table-striped">
-                    <thead>
-                        <tr class="text-center">
-                            <th>Codigo</th>
-                            <th>Nombre</th>
-                            <th>Unidades</th>
-                            <th>Departamento</th>
-                            <th>Opcion</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for materia in materias %}
-                        <tr class="text-center">
-                            <td>{{materia.codigo}}</td>
-                            <td>{{materia.nombre}}</td>
-                            <td>{{materia.creditos}}</td>
-                            <td>{{materia.departamento_id}}</td>
-                            <td><a href="{% url 'academico:agregar' materia.codigo %}" class="btn btn-success">Agregar</a></td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <p>No hay materias en este semestre</p>
-                {% endif %}
-                {% endfor %}
+<div class="container">
+    <div class="row py-4">
+        <!-- Seccion de listado de Cursos -->
+        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        </div>
-    </div>
-
-    <!-- Seccion del Formulario -->
-    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title">Asignaturas a inscribir</h2>
-                <div class="table-responsive">
+            {% endfor %}
+            {% endif %}
+            <div class="card">
+                
+                <div class="card-body">
+                    <h2>Asignatura Ofertadas</h2>
+                    {% for semestre, materias in materias_semestre.items %}
+                    <h3>{{semestre}}</h3>
+                    {% if materias %}
                     <table class="table table-striped">
                         <thead>
                             <tr class="text-center">
                                 <th>Codigo</th>
                                 <th>Nombre</th>
-                                <th>Creditos</th>
-                                <th>Especialidad</th>
+                                <th>Unidades</th>
+                                <th>Departamento</th>
                                 <th>Opcion</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% if request.session.carrito.items %}
-                            {% for key, value in request.session.carrito.items %}
+                        {% for materia in materias %}
                             <tr class="text-center">
-                                <td>{{value.materia_codigo}}</td>
-                                <td>{{value.nombre}}</td>
-                                <td>{{value.unidades}}</td>
-                                <td>{{value.carrera}}</td>
-                                <td><a href="{% url 'academico:eliminar' value.materia_codigo  %}" class="btn btn-danger">Eliminar</a></td>
+                                <td>{{materia.codigo}}</td>
+                                <td>{{materia.nombre}}</td>
+                                <td>{{materia.creditos}}</td>
+                                <td>{{materia.departamento_id}}</td>
+                                <td><a href="{% url 'academico:agregar' materia.codigo %}" class="btn btn-success">Agregar</a></td>
                             </tr>
-                            {% endfor %}
-                            {% else %}
-                            <tr>
-                                <th colspan="6"><div class="alert alert-danger text-center"><p>Sin materias</p></div></th>
-                                
-                            </tr>
-                            {% endif %}
-                            <tr>
-                                <th scope="row" colspan="2">Total de creditos: </th>
-                                <td>{{total_creditos}}</td>
-                            </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
+                    {% else %}
+                    <p>No hay materias en este semestre</p>
+                    {% endif %}
+                    {% endfor %}
                 </div>
-                <div class="row text-center">
-                    <a href="{% url 'academico:estado_pago' %}" class="btn btn-success my-2">Inscribir</a>
-                    <a href="{% url 'academico:limpiar' %}" class="btn btn-danger">Limpiar</a>
+            </div>
+        </div>
+
+        <!-- Seccion del Formulario -->
+        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Asignaturas a inscribir</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>Codigo</th>
+                                    <th>Nombre</th>
+                                    <th>Creditos</th>
+                                    <th>Especialidad</th>
+                                    <th>Opcion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if request.session.carrito.items %}
+                                {% for key, value in request.session.carrito.items %}
+                                <tr class="text-center">
+                                    <td>{{value.materia_codigo}}</td>
+                                    <td>{{value.nombre}}</td>
+                                    <td>{{value.unidades}}</td>
+                                    <td>{{value.carrera}}</td>
+                                    <td><a href="{% url 'academico:eliminar' value.materia_codigo  %}" class="btn btn-danger">Eliminar</a></td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <th colspan="6"><div class="alert alert-danger text-center"><p>Sin materias</p></div></th>
+                                    
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <th scope="row" colspan="2">Total de creditos: </th>
+                                    <td>{{total_creditos}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row text-center">
+                        <a href="{% url 'academico:estado_pago' %}" class="btn btn-success my-2">Inscribir</a>
+                        <a href="{% url 'academico:limpiar' %}" class="btn btn-danger">Limpiar</a>
+                    </div>
                 </div>
             </div>
         </div>
