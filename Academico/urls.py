@@ -24,9 +24,10 @@ urlpatterns = [
      path('inscripciones/agregarMateria/<codigo>', login_required(views.agregar_materia), name="agregar"),
      path('inscripciones/eliminarMateria/<codigo>', login_required(views.eliminar_materia), name="eliminar"),
      path('inscripciones/limpiarCarrito', login_required(views.limpiar_carrito), name="limpiar"),
-     # path('inscripciones/obtenerCarrito', login_required(views.obtener_carrito), name="obtener_carrito"),
      path('pago/estado_pago', login_required(views.estado_pago), name="estado_pago"),
      path('pago/volver_pendiente', login_required(views.volver_pendiente), name="volver_pendiente"),
+     path('pago/volver_pago', login_required(views.volver_pago), name="volver_pago"),
+     path('pago/estado_inscrito', login_required(views.estado_inscrito), name="estado_inscrito"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
