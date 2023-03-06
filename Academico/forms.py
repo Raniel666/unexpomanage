@@ -92,7 +92,3 @@ class FormularioUsuario(forms.ModelForm):
         if commit:
             user.save()
         return user
-
-
-class FormularioPago(forms.Form):
-    cantidad_pago = forms.FloatField()
