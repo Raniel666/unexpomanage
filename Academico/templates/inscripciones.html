@@ -50,6 +50,7 @@ Inscripciones
                                 <th>Nombre</th>
                                 <th>Unidades</th>
                                 <th>Departamento</th>
+                                <th>Estado</th>
                                 <th>Opcion</th>
                             </tr>
                         </thead>
@@ -60,6 +61,11 @@ Inscripciones
                                 <td>{{materia.nombre}}</td>
                                 <td>{{materia.creditos}}</td>
                                 <td>{{materia.departamento_id}}</td>
+                                {% if materia.abierta %}
+                                <td>Abierto</td>
+                                {% else %}
+                                <td>Cerrado</td>
+                                {% endif %}
                                 <td><a href="{% url 'academico:agregar' materia.codigo %}" class="btn btn-success">Agregar</a></td>
                             </tr>
                         {% endfor %}
