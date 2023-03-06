@@ -81,8 +81,28 @@ def editarCurso(request):
 
 
 def cursos(request):
-    carreras = Carrera.objects.all()
-    return render(request, "index.html", {"carreras": carreras})
+    estudiante = request.user.id
+    # Obtengo los registros de inscripcion del estudiante
+    registros_inscripcion = RegistroInscripcion.objects.filter(
+        estudiante_id=estudiante,
+        estado="inscrito"
+    )
+
+    if registros_inscripcion:
+        for registro in registros_inscripcion:
+            materias = registro.materias_ids.all()
+
+        context = {
+            "registro_inscripcion": registros_inscripcion,
+            "materias": materias
+        }
+        return render(request, "index.html", context)
+    else:
+        context = {
+            "registro_inscripcion": False,
+            "materias": False
+        }
+        return render(request, "index.html", context)
 
 
 def seleccion_carrera(request, codigo):
