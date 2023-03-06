@@ -53,16 +53,12 @@ Inscripcion Pago
             </tr>
         </tbody>
     </table>
+    <p style="font-size: 50;">Total a pagar: <b style="color: green;">{{pago_total}}$</b></p>
+    <p><a href="{% url 'academico:estado_inscrito' %}" class="btn btn-info">Confirmar pago</a></p>
+    <p><a href="{% url 'academico:volver_pendiente' %}" class="btn btn-info">Volver a pendiente</a></p>
 </div>
 {% endfor %}
 {% else %}
 <p>No hay registro de inscripcion</p>
 {% endif %}
-<p style="font-size: 50;">Total de creditos a pagar: <b style="color: green;">{{unidades_totales}}</b></p>
-<form action="" method="POST">
-    {% csrf_token %}
-    {{pago_form.as_table}}
-    <input type="submit" value="Confirmar">
-</form>
-<p><a href="{% url 'academico:volver_pendiente' %}" class="btn btn-info">Volver a pendiente</a></p>
 {% endblock %}
