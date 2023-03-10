@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from django.views.generic import CreateView, ListView
-from .forms import AsignaturaForm, FormularioUsuario
+from .forms import AsignaturaForm, FormularioUsuario, RegistroInscripcionForm
 from .models import Materia, Usuario, Departamento, Carrera, RegistroInscripcion, RegistroPago
 from django.contrib import messages
 from .carrito import Carrito
@@ -18,7 +18,27 @@ def portada(request):
 
 
 def asignatura_admin(request):
+    form = RegistroInscripcionForm()
+
+    if request.method == 'POST':
+        form = AsignaturaForm(data=request.POST)
+        try:
+            if form.is_valid():
+                form.save()
+                # Datos correctos
+                messages.success(request, "Curso Registrado!")
+                return redirect('academico:pensum')
+        except ValueError:
+            return render(request, '/pensum', {"asignaturas": asignaturas, "form": form, 'error': 'Ingresa valores correctamente'})
+
+    messages.success(request, "Cursos listados!")
+
+    return render(request, "materia.html", {"asignaturas": asignaturas, "form": form})
+
+
+def asignatura_admin(request):
     form = AsignaturaForm()
+
     # En una variable guardamos todos los materia de una db
     asignaturas = Materia.objects.all()
     if request.method == 'POST':
@@ -119,7 +139,8 @@ def seleccion_carrera(request, codigo):
             semestre_dict[f"{semestre[1]}"] = []
             for departamento in departamentos:
                 dpto_code = departamento.codigo_dep
-                materias = Materia.objects.filter(departamento_id=dpto_code, semestre=semestre[0])
+                materias = Materia.objects.filter(
+                    departamento_id=dpto_code, semestre=semestre[0])
                 for materia in materias:
                     semestre_dict[f"{semestre[1]}"].append(materia)
 
@@ -156,12 +177,11 @@ class registrarUsuario(CreateView):
                 expediente=form.cleaned_data['expediente'],
                 cedula=form.cleaned_data['cedula'],
                 creditos_aprobados=form.cleaned_data['creditos_aprobados'],
-                carrera=form.cleaned_data['carrera'],
+                carrera_id=form.cleaned_data['carrera_id'],
                 semestre=form.cleaned_data['semestre'],
                 tipo_estudiante=form.cleaned_data['tipo_estudiante'],
                 imagen=form.cleaned_data['imagen'],
-                fecha_inscripcion=form.cleaned_data['fecha_inscripcion'],
-                hora_inscripcion=form.cleaned_data['hora_inscripcion'],
+
             )
             nuevo_usuario.set_password(form.cleaned_data['password1'])
             nuevo_usuario.save()
@@ -190,11 +210,8 @@ def editarUsuario(request):
     email = request.POST['email']
     cedula = request.POST['cedula']
     creditos_aprobados = request.POST['creditos_aprobados']
-    carrera = request.POST['carrera']
-    semestre = request.POST['semestre']
+
     tipo_estudiante = request.POST['tipo_estudiante']
-    fecha_inscripcion = request.POST['fecha_inscripcion']
-    hora_inscripcion = request.POST['hora_inscripcion']
 
     user = Usuario.objects.get(expediente=expediente)
     user.nombres = nombres
@@ -203,11 +220,9 @@ def editarUsuario(request):
     user.email = email
     user.cedula = cedula
     user.creditos_aprobados = creditos_aprobados
-    user.carrera = carrera
-    user.semestre = semestre
+
     user.tipo_estudiante = tipo_estudiante
-    user.fecha_inscripcion = fecha_inscripcion
-    user.hora_inscripcion = hora_inscripcion
+
     user.save()
 
     return redirect("academico:listarUsuarios")
@@ -218,7 +233,8 @@ def inscripciones(request):
     estudiante = request.user.id
 
     # Obtengo los registros de inscripcion del estudiante
-    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante)
+    registros_inscripcion = RegistroInscripcion.objects.filter(
+        estudiante_id=estudiante)
 
     # Si tiene inscripciones en pendiente, traeme el registro
     if registros_inscripcion:
@@ -238,16 +254,19 @@ def inscripciones(request):
 
                 if carrera:
                     # Si existe la carrera traeme los departamentos de esa carrera
-                    departamentos = Departamento.objects.filter(carrera_ids=codigo)
+                    departamentos = Departamento.objects.filter(
+                        carrera_ids=codigo)
 
                     # Guarda en un diccionario las materias por semestre
                     for semestre in semestres:
                         semestre_dict[f"{semestre[1]}"] = []
                         for departamento in departamentos:
                             dpto_code = departamento.codigo_dep
-                            materias = Materia.objects.filter(departamento_id=dpto_code, semestre=semestre[0])
+                            materias = Materia.objects.filter(
+                                departamento_id=dpto_code, semestre=semestre[0])
                             for materia in materias:
-                                materias_inscritas = RegistroInscripcion.objects.filter(materias_ids=materia)
+                                materias_inscritas = RegistroInscripcion.objects.filter(
+                                    materias_ids=materia)
                                 if len(materias_inscritas) >= 2:
                                     materia.abierta = False
                                 else:
@@ -305,7 +324,8 @@ def limpiar_carrito(request):
 def estado_pago(request):
     carrito = Carrito(request).carrito
     estudiante_id = request.user.id
-    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id)
+    registros_inscripcion = RegistroInscripcion.objects.filter(
+        estudiante_id=estudiante_id)
 
     if registros_inscripcion:
         for registro in registros_inscripcion:
@@ -316,7 +336,8 @@ def estado_pago(request):
                 materias = Materia.objects.filter(codigo__in=materias_ids)
                 registro.materias_ids.set(materias)
                 registro.estado = "pago"
-                registro.fecha_inscripcion = datetime.now(pytz.timezone('America/Caracas'))
+                registro.fecha_inscripcion = datetime.now(
+                    pytz.timezone('America/Caracas'))
                 registro.save()
 
                 materias = registro.materias_ids.all()
@@ -348,7 +369,8 @@ def estado_pago(request):
 
 def estado_inscrito(request):
     estudiante_id = request.user.id
-    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id)
+    registros_inscripcion = RegistroInscripcion.objects.filter(
+        estudiante_id=estudiante_id)
 
     if registros_inscripcion:
         for registro in registros_inscripcion:
@@ -390,7 +412,8 @@ def estado_inscrito(request):
 
 def volver_pendiente(request):
     estudiante_id = request.user.id
-    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id, estado="pago")
+    registros_inscripcion = RegistroInscripcion.objects.filter(
+        estudiante_id=estudiante_id, estado="pago")
 
     if registros_inscripcion:
         for registro in registros_inscripcion:
@@ -402,7 +425,8 @@ def volver_pendiente(request):
 
 def volver_pago(request):
     estudiante_id = request.user.id
-    registros_inscripcion = RegistroInscripcion.objects.filter(estudiante_id=estudiante_id, estado="inscrito")
+    registros_inscripcion = RegistroInscripcion.objects.filter(
+        estudiante_id=estudiante_id, estado="inscrito")
 
     if registros_inscripcion:
         for registro in registros_inscripcion:

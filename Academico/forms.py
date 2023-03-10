@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from .models import Materia, Usuario
+from .models import Materia, Usuario, RegistroInscripcion
 
 
 # FORMULARIO PARA EL REGISTRO DE LAS ASIGNATURAS
@@ -60,14 +60,13 @@ class FormularioUsuario(forms.ModelForm):
         model = Usuario
         fields = (
             'username', 'email', 'nombres', 'apellidos',
-            'expediente', 'cedula', 'creditos_aprobados', 'carrera',
-            'semestre', 'tipo_estudiante', 'imagen', 'fecha_inscripcion',
-            'hora_inscripcion'
+            'expediente', 'cedula', 'creditos_aprobados', 'carrera_id',
+            'semestre', 'tipo_estudiante', 'imagen',
         )
-        widgets = {
-            'fecha_inscripcion': forms.DateInput(attrs={'type': 'date'}),
-            'hora_inscripcion': forms.DateInput(attrs={'type': 'time'})
-        }
+        # widgets = {
+        #     'fecha_inscripcion': forms.DateInput(attrs={'type': 'date'}),
+        #     'hora_inscripcion': forms.DateInput(attrs={'type': 'time'})
+        # }
 
     def clean_password2(self):
         """
@@ -92,3 +91,10 @@ class FormularioUsuario(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class RegistroInscripcionForm(ModelForm):
+    class Meta:
+        model = RegistroInscripcion
+        # Creamos los campos a  traves del formulario
+        fields = ('fecha_apertura', 'estudiante_id')

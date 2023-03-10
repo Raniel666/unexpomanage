@@ -6,17 +6,14 @@
 Inscripciones
 {% endblock %}
 
-{% block estilos %} 
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;1,300;1,600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/responsive.css">
-{% endblock %}
+
 
 {% block body %}
 {% if registro_inscripcion %}
 {% if turno_abierto %}
-<p>Estado del registro de inscripcion: <strong style="color: green;">{{inscripcion_estado}}</strong></p>
+<div class="container">
+<h6 class="m-4">Estado del registro de inscripcion: <strong style="color: green;">{{inscripcion_estado}}</strong></h6>
+</div>
 <div class="container">
     <div class="progress bg-info" role="progressbar" aria-label="Basic example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="height: 30px;">
         <div class="progress-bar bg-success" style="width: 100%; height: 30px;">Pendiente</div>
@@ -27,7 +24,7 @@ Inscripciones
 <div class="container">
     <div class="row py-4">
         <!-- Seccion de listado de Cursos -->
-        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6">
             {% if messages %}
             {% for message in messages %}
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -36,51 +33,63 @@ Inscripciones
             </div>
             {% endfor %}
             {% endif %}
-            <div class="card">
-                
-                <div class="card-body">
-                    <h2>Asignatura Ofertadas</h2>
+            <div class="card ">
+                <div class="accordion" id="accordionExample">
+                    <h2 class="p-4">Asignatura Ofertadas</h2>
                     {% for semestre, materias in materias_semestre.items %}
-                    <h3>{{semestre}}</h3>
-                    {% if materias %}
-                    <table class="table table-striped">
-                        <thead>
-                            <tr class="text-center">
-                                <th>Codigo</th>
-                                <th>Nombre</th>
-                                <th>Unidades</th>
-                                <th>Departamento</th>
-                                <th>Estado</th>
-                                <th>Opcion</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for materia in materias %}
-                            <tr class="text-center">
-                                <td>{{materia.codigo}}</td>
-                                <td>{{materia.nombre}}</td>
-                                <td>{{materia.creditos}}</td>
-                                <td>{{materia.departamento_id}}</td>
-                                {% if materia.abierta %}
-                                <td>Abierto</td>
-                                {% else %}
-                                <td>Cerrado</td>
-                                {% endif %}
-                                <td><a href="{% url 'academico:agregar' materia.codigo %}" class="btn btn-success">Agregar</a></td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    {% else %}
-                    <p>No hay materias en este semestre</p>
-                    {% endif %}
+                    <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        {{semestre}}
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            {% if materias %}
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>Codigo</th>
+                                        <th>Nombre</th>
+                                        <th>Unidades</th>
+                                        <th>Departamento</th>
+                                        <th>Estado</th>
+                                        <th>Opcion</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for materia in materias %}
+                                    <tr class="text-center">
+                                        <td>{{materia.codigo}}</td>
+                                        <td>{{materia.nombre}}</td>
+                                        <td>{{materia.creditos}}</td>
+                                        <td>{{materia.departamento_id}}</td>
+                                        {% if materia.abierta %}
+                                        <td>Abierto</td>
+                                        {% else %}
+                                        <td>Cerrado</td>
+                                        {% endif %}
+                                        <td><a href="{% url 'academico:agregar' materia.codigo %}" class="btn btn-success">Agregar</a></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p>No hay materias en este semestre</p>
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+
                     {% endfor %}
-                </div>
+                    </div>
+        
+             
             </div>
         </div>
 
         <!-- Seccion del Formulario -->
-        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6">
             <div class="card">
                 <div class="card-body">
                     <h2 class="card-title">Asignaturas a inscribir</h2>

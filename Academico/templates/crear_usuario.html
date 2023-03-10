@@ -24,11 +24,14 @@ Registrar usuario
             <div class="form-group">
                 {{ form | crispy}}
             </div>
+
             <div class="card-footer">
                 <a href="{% url 'academico:listarUsuarios' %}" class="btn btn-danger">Cancelar</a>
                 <button class="btn btn-primary"  type="submit">Registrar</button>
             </div>
         </form>
+
+
     </div>
 </div>
 {% endblock %}
